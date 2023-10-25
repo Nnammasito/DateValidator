@@ -37,17 +37,19 @@ namespace DateValidator.Models
 
     public class FutureDateAttribute : ValidationAttribute
     {
-        protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value is DateTime date)
-            {
-                if (date > DateTime.Now)
-                {
-                    return ValidationResult.Success!; // La fecha es válida.
-                }
-            }
+            DateTime dt;
+            // safely unbox value to DateTime
+            if(value is DateTime)
+                dt = (DateTime)value;
+            else
+                return new ValidationResult("Invalid datetime");
+            
+            if(dt < DateTime.Now)
+                return new ValidationResult("Date must be in the future");
 
-            return new ValidationResult("La fecha debe ser posterior a la fecha actual.");
+            return ValidationResult.Success;
         }
     }
 }
